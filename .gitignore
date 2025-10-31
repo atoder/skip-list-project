@@ -22,5 +22,6 @@ cookie.txt
 # Ignore all .env files.
 .env
 .env.*
-# DOoNOT ignore the example template.
+# Do NOT ignore the example template.
 !.env.example
+
