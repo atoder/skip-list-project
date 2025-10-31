@@ -185,3 +185,4 @@ final class SkipListTest extends TestCase
         $this->assertSame($items, $this->list->toArray());
     }
 }
+

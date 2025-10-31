@@ -77,3 +77,4 @@ This project is a "monorepo" to simplify development.
 
 * **`/application/frontend` (The Dining Room):** This is the React app
     the user sees. It knows nothing about PHP; it just calls the API.
+

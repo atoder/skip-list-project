@@ -45,3 +45,4 @@ final class SkipListNode
         $this->forward = array_fill(0, $level + 1, null);
     }
 }
+
