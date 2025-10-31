@@ -44,7 +44,7 @@ persists the list in a PHP session.
 2.  `composer install` (This will use `atoder/sorted-linked-list` from the local path)
 3.  Run a local PHP server in the `public` directory:
     ```bash
-    php -S localhost:8.000 -t public
+    php -S localhost:8000 -t public
     ```
 4.  Your API is live. Good job.
 
@@ -53,7 +53,7 @@ persists the list in a PHP session.
 A responsive React app for the UI.
 
 * Uses **Tailwind CSS** for styling.
-* Uses **Framer Motion** for smooth, professional animations.
+* Uses **Framer Motion** for smooth animations.
 
 **To run the frontend:**
 
@@ -62,3 +62,18 @@ A responsive React app for the UI.
 3.  `npm install framer-motion` (if not in package.json)
 4.  `npm start`
 5.  Your app is live. Good job.
+
+---
+
+## Architecture Note: The Monorepo
+
+This project is a "monorepo" to simplify development.
+
+* **`/library` (The Recipe Book):** This is the core IP. It's the
+    `atoder/sorted-linked-list` package, fully tested in isolation.
+
+* **`/application/api` (The Kitchen):** This is the backend. It's a
+    separate Composer project that `requires` the local Recipe Book.
+
+* **`/application/frontend` (The Dining Room):** This is the React app
+    the user sees. It knows nothing about PHP; it just calls the API.
