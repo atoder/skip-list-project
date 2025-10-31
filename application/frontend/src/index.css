@@ -1,0 +1,30 @@
+/*
+ * Blueprint.
+ * This file is the engine for Tailwind.
+ *
+ * The PostCSS build process reads these '@tailwind' directives,
+ * scans your .tsx files, and builds the final, optimized CSS.
+ *
+ *
+ */
+
+/*
+ * 1. The Foundation.
+ * This injects the base styles and browser resets (normalize.css).
+ * Makes sure your work looks the same everywhere.
+ */
+@tailwind base;
+
+/*
+ * 2. The Components.
+ * Injects any pre-built component classes (e.g., .container).
+ */
+@tailwind components;
+
+/*
+ * 3. The Utilities.
+ * This is the main event. Injects all the classes you actually use,
+ * like 'text-4xl' and 'bg-gray-900'.
+ */
+@tailwind utilities;
+
