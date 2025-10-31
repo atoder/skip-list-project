@@ -15,5 +15,12 @@
 .DS_Store
 
 # Local Test Artifacts
-cookie
+cookie.txt
 /application/api/sessions/
+
+# Environment Variables
+# Ignore all .env files...
+.env
+.env.*
+# Do NOT ignore the example template.
+!.env.example
