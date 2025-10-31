@@ -1,0 +1,15 @@
+# Composer
+/library/vendor/
+/application/api/vendor/
+
+# PHPUnit
+/library/.phpunit.cache/
+
+# Node.js
+/application/frontend/node_modules/
+/application/frontend/build/
+/application/frontend/.pnp.js
+/application/frontend/.pnp.loader.mjs
+
+# OS
+.DS_Store
