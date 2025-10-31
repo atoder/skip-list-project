@@ -16,3 +16,4 @@
 
 # Local Test Artifacts
 cookie
+/application/api/sessions/

@@ -1,9 +1,11 @@
 # 🚀 Skip List Project
 
 This project is a high-performance PHP library designed to implement a `SortedLinkedList`.
-It's built using a Skip List data structure to achieve `O(log n)` (logarithmic) performance, which is a massive improvement over a standard linked list's `O(n)`.
+It's built using a Skip List data structure to achieve `O(log n)` (logarithmic)
+performance, which is a massive improvement over a standard linked list's `O(n)`.
 
-The repository is a "monorepo" containing both the core library and a full-stack demo application to visualize it.
+The repository is a "monorepo" containing both the core library and a
+full-stack demo application to visualize it.
 
 * `/library` - The Core Library (PHP 8.1, PHPUnit)
 * `/application` - The Demo App (PHP API, React, TypeScript)
@@ -23,11 +25,11 @@ See the `library/README.md` for its full API and developer details.
 
 ## 2. 💻 The Demo App (`/application`)
 
-This is a full-stack application that consumes the `library` to provide a live and interactive visualizer.
+This is a full-stack application that utilizes the `library` for the interactive visualizer.
 
 ### API (PHP)
 
-A simple backend that uses Composer to load the local library and persists the list in a PHP session.
+A backend that uses Composer to load the local library and persists the list in a PHP session.
 
 To run the API:
 
