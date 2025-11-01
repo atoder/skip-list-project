@@ -25,3 +25,6 @@ cookie.txt
 # Do NOT ignore the example template.
 !.env.example
 
+# Explicitly ignore the local-only API config file
+/application/api/.env
+
