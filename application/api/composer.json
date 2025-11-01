@@ -4,7 +4,8 @@
     "type": "project",
     "require": {
         "php": ">=8.1",
-        "atoder/sorted-linked-list": "@dev"
+        "atoder/sorted-linked-list": "@dev",
+        "vlucas/phpdotenv": "^5.6"
     },
     "repositories": [
         {
@@ -20,4 +21,5 @@
     "minimum-stability": "dev",
     "prefer-stable": true
 }
+
 
