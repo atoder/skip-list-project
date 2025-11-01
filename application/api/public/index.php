@@ -141,11 +141,7 @@ try {
 }
 
 // 8. Send JSON Response
-
-// Set the header to tell the browser this is JSON.
-header('Content-Type: application/json');
-
-// --- PRO-GRADE CORS ---
+//
 // The "Guest List" is now loaded from your .env file.
 $allowed_origins_str = $_ENV['CORS_ALLOWED_ORIGINS'] ?? 'http://localhost:3000';
 $allowed_origins = explode(',', $allowed_origins_str);
@@ -167,4 +163,3 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 // Convert the PHP $response array into a JSON string and send it.
 echo json_encode($response, JSON_PRETTY_PRINT);
-
