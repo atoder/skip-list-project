@@ -4,9 +4,9 @@
  * This file is the single API endpoint for the Skip List visualizer.
  *
  * It's the "controller" that consumes the `atoder/sorted-linked-list` library.
- * It handles all incoming requests, manages the SkipList object in the
- * PHP session (state persistence), and returns JSON responses for the
- * React frontend.
+ * It loads configuration from a .env file, handles all incoming requests,
+ * manages the SkipList object in the PHP session (state persistence),
+ * and returns JSON responses for the React frontend.
  */
 
 // API namespace (from our composer.json)
@@ -15,37 +15,65 @@ namespace Atoder\Api;
 // 1. Load the Composer Autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
-// 2. Import the classes we need
+// 2. Load Environment Variables (.env)
+// This  loads config from a .env file.
+// __DIR__ . '/../' points to the 'application/api/' folder.
+try {
+    $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load(); // All variables are now in $_ENV
+} catch (\Dotenv\Exception\InvalidPathException $e) {
+    // This is a fallback for production environments that set env vars directly
+    // No .env file found but we continue anyway.
+}
+
+// 3. Import the classes we need
 use Atoder\SortedLinkedList\SkipList;
 use TypeError;
 
-// 3. Configure and Start PHP Session
-if (getenv('APP_ENV') === 'development') {
-    $sessionPath = __DIR__ . '/../sessions';
-    if (!is_dir($sessionPath)) {
+// 4. Configure and Start PHP Session
+// This is now environment-aware based on the .env file.
+if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+    $sessionPath = $_ENV['SESSION_PATH'] ?? '../sessions';
+    // This path is relative to this file (index.php)
+    $fullSessionPath = realpath(__DIR__ . '/' . $sessionPath);
+
+    if ($fullSessionPath === false) {
+        // Attempt to create it if it doesn't exist
         mkdir($sessionPath, 0777, true);
+        $fullSessionPath = realpath(__DIR__ . '/' . $sessionPath);
     }
-    ini_set('session.save_path', $sessionPath);
+
+    if (is_dir($fullSessionPath) && is_writable($fullSessionPath)) {
+        ini_set('session.save_path', $fullSessionPath);
+    } else {
+        // Log an error if the path is still bad
+        error_log("Session save path is not writable: " . $fullSessionPath);
+    }
 }
 
+// session_start() tells PHP to load or create a session file
+// for the user, which gives us the $_SESSION array.
 session_start();
 
-// 4. Initialize the List
+// 5. Initialize the List
 if (!isset($_SESSION['skip_list'])) {
     $_SESSION['skip_list'] = new SkipList();
 }
 
 $list = $_SESSION['skip_list'];
 
-// 5. API Router
+// 6. API Router
 $data = json_decode(file_get_contents('php://input'), true) ?? [];
-
 $action = $_GET['action'] ?? null;
 $value = $data['value'] ?? null;
 $response = [];
 
 try {
     switch ($action) {
+        /**
+         * POST /index.php?action=insert
+         * Inserts a value into the list.
+         */
         case 'insert':
             if ($value === null) {
                 throw new \Exception('Value cannot be null.');
@@ -55,6 +83,10 @@ try {
             $response['message'] = "Inserted: {$valueToInsert}. Good job.";
             break;
 
+        /**
+         * POST /index.php?action=delete
+         * Deletes a value from the list.
+         */
         case 'delete':
             if ($value === null) {
                 throw new \Exception('Value cannot be null.');
@@ -68,11 +100,19 @@ try {
             }
             break;
 
+        /**
+         * POST /index.php?action=reset
+         * Resets the list to an empty state.
+         */
         case 'reset':
             $list = new SkipList();
             $response['message'] = 'List reset. Back to work.';
             break;
 
+        /**
+         * GET /index.php?action=getall
+         * Returns the full structure of the list for visualization.
+         */
         case 'getall':
             $response['structure'] = [
                 'total_height' => $list->getMaxHeight(),
@@ -86,32 +126,45 @@ try {
             throw new \Exception('Invalid action.');
     }
 
+    // 7. Save State
     $_SESSION['skip_list'] = $list;
     $response['success'] = true;
 
 } catch (TypeError $e) {
+    // Catch the TypeErrors from our library (int vs string)
     $response['success'] = false;
     $response['message'] = $e->getMessage();
 } catch (\Exception $e) {
+    // Catch all other errors (e.g., "Invalid action")
     $response['success'] = false;
     $response['message'] = $e->getMessage();
 }
 
-// 7. Send JSON Response - MINIMAL FIX HERE
+// 8. Send JSON Response
+
+// Set the header to tell the browser this is JSON.
 header('Content-Type: application/json');
 
-// FIXED CORS headers (only these lines changed)
-$allowed_origins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+// --- PRO-GRADE CORS ---
+// The "Guest List" is now loaded from your .env file.
+$allowed_origins_str = $_ENV['CORS_ALLOWED_ORIGINS'] ?? 'http://localhost:3000';
+$allowed_origins = explode(',', $allowed_origins_str);
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+// Trim whitespace from all allowed origins
+$allowed_origins = array_map('trim', $allowed_origins);
 
 if (in_array($origin, $allowed_origins)) {
     header("Access-Control-Allow-Origin: $origin");
 } else {
-    header("Access-Control-Allow-Origin: http://localhost:3000");
+    // Block any origin not on the list by default, but fallback for safety.
+    header("Access-Control-Allow-Origin: " . $allowed_origins[0]);
 }
+
 header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
+// Convert the PHP $response array into a JSON string and send it.
 echo json_encode($response, JSON_PRETTY_PRINT);
 
