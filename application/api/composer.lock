@@ -1,0 +1,61 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "b4dcba776de7ab48a660e32e0f4a3a6b",
+    "packages": [
+        {
+            "name": "atoder/sorted-linked-list",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../../library",
+                "reference": "59bcb972472c78d5e752abc2d3b3354ff3f1f98d"
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Atoder\\SortedLinkedList\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Atoder\\SortedLinkedList\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexander T"
+                }
+            ],
+            "description": "A high-performance SortedLinkedList implementation using a Skip List.",
+            "transport-options": {
+                "relative": true
+            }
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "atoder/sorted-linked-list": 20
+    },
+    "prefer-stable": true,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=8.1"
+    },
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
+}

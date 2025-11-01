@@ -27,6 +27,12 @@ export interface SkipListStructure {
 // It reads from the .env file, with a fallback to the hard-coded URL for safety.
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/index.php';
 
+// 🔐 DEVELOPMENT-ONLY: Enable cross-origin cookies for PHP session persistence
+// Required because browser blocks cookies between localhost:3000 (frontend) and localhost:8000 (backend)
+// In production (same domain), cookies work automatically - this setting is unnecessary
+if (process.env.NODE_ENV === 'development') {
+  axios.defaults.withCredentials = true;
+}
 
 // Dark Mode Hook
 function useDarkMode() {
@@ -303,11 +309,11 @@ function App() {
             </div>
 
             {/* Data Nodes (Animated with Framer Motion) */}
-            <AnimatePresence>
-              {listData?.nodes.map((node) => (
+            {React.createElement(AnimatePresence as any, { mode: "popLayout" },
+              listData?.nodes.map((node) => (
                 <motion.div
-                  key={node.id} // Use the unique ID for animations
-                  layout // This animates position (x)
+                  key={node.id}
+                  layout
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
@@ -329,7 +335,7 @@ function App() {
                           )}
                           {/* Node Cell */}
                           <div className="h-12 w-full rounded border-2 border-blue-500 dark:border-blue-400
-                                          bg-blue-100 dark:bg-blue-800 z-10"
+                            bg-blue-100 dark:bg-blue-800 z-10"
                           />
                         </>
                       ) : (
@@ -346,8 +352,8 @@ function App() {
                     {String(node.value)}
                   </div>
                 </motion.div>
-              ))}
-            </AnimatePresence>
+              ))
+            )}
           </div>
         )}
       </div>
@@ -356,4 +362,3 @@ function App() {
 }
 
 export default App;
-
