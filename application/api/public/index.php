@@ -31,8 +31,21 @@ use Atoder\SortedLinkedList\SkipList;
 use TypeError;
 
 // 4. Configure and Start PHP Session
-// We use the container's always writable /tmp directory.
+// Hybrid session management: Redis if available, else file sessions
+// Redis hack for render.com since disk space is not available in free tier
 // This is a solution for both local dev and production.
+$redis = null;
+$redisUrl = getenv('REDIS_URL');
+if ($redisUrl) {
+    try {
+        $redis = new \Predis\Client($redisUrl);
+        $redis->ping(); // Test connection
+    } catch (Exception $e) {
+        // Fall back to file sessions if Redis fails
+        $redis = null;
+    }
+}
+
 $sessionPath = '/tmp/skip-list-session';
 if (!is_dir($sessionPath)) {
     // Use @ to suppress warnings if the dir already exists (race condition)
@@ -46,11 +59,18 @@ ini_set('session.save_path', realpath($sessionPath));
 session_start();
 
 // 5. Initialize the List
-if (!isset($_SESSION['skip_list'])) {
-    $_SESSION['skip_list'] = new SkipList();
+// === MINIMAL MODIFICATION START ===
+if ($redis) {
+    // Use Redis if available
+    $serializedList = $redis->get('skip_list');
+    $list = $serializedList ? unserialize($serializedList) : new SkipList();
+} else {
+    // Use file sessions as fallback
+    if (!isset($_SESSION['skip_list'])) {
+        $_SESSION['skip_list'] = new SkipList();
+    }
+    $list = $_SESSION['skip_list'];
 }
-
-$list = $_SESSION['skip_list'];
 
 // 6. API Router
 $data = json_decode(file_get_contents('php://input'), true) ?? [];
@@ -117,7 +137,11 @@ try {
     }
 
     // 7. Save State
-    $_SESSION['skip_list'] = $list;
+    if ($redis) {
+        $redis->setex('skip_list', 3600, serialize($list)); // 1-hour expiration
+    } else {
+        $_SESSION['skip_list'] = $list;
+    }
     $response['success'] = true;
 
 } catch (TypeError $e) {
@@ -131,7 +155,6 @@ try {
 }
 
 // 8. Send JSON Response
-//
 // The "Guest List" is now loaded from your .env file.
 $allowed_origins_str = $_ENV['CORS_ALLOWED_ORIGINS'] ?? 'http://localhost:3000';
 $allowed_origins = explode(',', $allowed_origins_str);
