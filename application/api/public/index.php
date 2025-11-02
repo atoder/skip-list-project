@@ -31,25 +31,15 @@ use Atoder\SortedLinkedList\SkipList;
 use TypeError;
 
 // 4. Configure and Start PHP Session
-// This is now environment-aware based on the .env file.
-if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
-    $sessionPath = $_ENV['SESSION_PATH'] ?? '../sessions';
-    // This path is relative to this file (index.php)
-    $fullSessionPath = realpath(__DIR__ . '/' . $sessionPath);
-
-    if ($fullSessionPath === false) {
-        // Attempt to create it if it doesn't exist
-        mkdir($sessionPath, 0777, true);
-        $fullSessionPath = realpath(__DIR__ . '/' . $sessionPath);
-    }
-
-    if (is_dir($fullSessionPath) && is_writable($fullSessionPath)) {
-        ini_set('session.save_path', $fullSessionPath);
-    } else {
-        // Log an error if the path is still bad
-        error_log("Session save path is not writable: " . $fullSessionPath);
-    }
+// We use the container's always writable /tmp directory.
+// This is a solution for both local dev and production.
+$sessionPath = '/tmp/skip-list-session';
+if (!is_dir($sessionPath)) {
+    // Use @ to suppress warnings if the dir already exists (race condition)
+    @mkdir($sessionPath, 0777, true);
 }
+// We always set the save path. This is a non-conditional build.
+ini_set('session.save_path', realpath($sessionPath));
 
 // session_start() tells PHP to load or create a session file
 // for the user, which gives us the $_SESSION array.
