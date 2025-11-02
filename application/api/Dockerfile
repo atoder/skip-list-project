@@ -2,6 +2,17 @@
 # This gives us PHP 8.1 and a production-ready web server.
 FROM php:8.1-apache
 
+# Install the system dependencies that Composer needs.
+# The 'php:8.1' image is lean and doesn't include 'git' or 'zip'.
+# We must install them before running 'composer install'.
+RUN apt-get update && \
+    apt-get install -y \
+        git \
+        unzip \
+        libzip-dev \
+    && docker-php-ext-install zip
+# --- END BUILD STEP ---
+
 # Set the main working directory for the container
 WORKDIR /var/www/html/
 
