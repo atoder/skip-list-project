@@ -17,6 +17,8 @@
 # Local Test Artifacts
 cookie.txt
 /application/api/sessions/
+/application/api/cookies.txt
+
 
 # Environment Variables
 # Ignore all .env files.
